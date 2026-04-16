@@ -1,31 +1,52 @@
+version: "3"
 services:
-  hmpps-warrant-risk-assessment-api:
-    image: ghcr.io/ministryofjustice/hmpps-warrant-risk-assessment-api:latest
+  warrant-risk-assessment-db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     networks:
       - hmpps
-    container_name: hmpps-warrant-risk-assessment-api
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
-    environment:
-      - SERVER_PORT=8080
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      - SPRING_PROFILES_ACTIVE=dev
-
   hmpps-auth:
     image: ghcr.io/ministryofjustice/hmpps-auth:latest
     networks:
       - hmpps
-    container_name: hmpps-auth
     ports:
-      - "8090:8080"
+      - "9090:8080"
     healthcheck:
-      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/auth/health" ]
     environment:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "8072:3000"
+    networks:
+      - hmpps
+  localstack:
+    image: localstack/localstack:4
+    networks:
+      - hmpps
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,sns
+      - DEFAULT_REGION=eu-west-2
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-/tmp/volume}:/var/lib/localstack"
+  wiremock-integration:
+    image: wiremock/wiremock:latest
+    volumes:
+      - ./wiremock:/home/wiremock
+    entrypoint: [ "/docker-entrypoint.sh", "--disable-gzip", "--verbose" ]
+    ports:
+      - "9101:8080"
+    networks:
+      - hmpps
 
 networks:
   hmpps:

@@ -8,8 +8,15 @@ spring:
 
 #  This jackson configuration is only applied for java.util.Date.
 #  It is ignored for LocalDateTime, and therefore unnecessary for most projects
-#  jackson:
-#    date-format: "yyyy-MM-dd HH:mm:ss"
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  datasource:
+    url: 'jdbc:postgresql://${database.endpoint:localhost:5432}/${database.name:postgres}'
+    username: '${database.username:postgres}'
+    password: '${database.password:postgres}'
 
   security:
     oauth2:
@@ -18,6 +25,12 @@ spring:
           jwk-set-uri: ${hmpps-auth.url}/.well-known/jwks.json
 
       client:
+        registration:
+          default:
+            provider: hmpps-auth
+            authorization-grant-type: client_credentials
+            client-id: ${hmpps-auth.client-id}
+            client-secret: ${hmpps-auth.client-secret}
         provider:
           hmpps-auth:
             token-uri: ${hmpps-auth.url}/oauth/token
@@ -58,9 +71,46 @@ management:
       cache:
         time-to-live: 2000ms
 
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
-    version: 5.32.1
+application:
+  notify:
+    warrant-risk-assessment:
+      template: 6c66ee34-f165-466c-8127-80c585e6015b
+
+hmpps.sar.additionalAccessRole: WARRANT_RISK_ASSESSMENT
+
+---
+spring.config.activate.on-profile: dev
+hmpps-auth.url: http://localhost:9090/auth
+frontend.url: http://localhost:3000
+gotenberg.url: http://localhost:8072
+ndelius-integration-api.url: http://localhost:9101
+database.endpoint: localhost:5432
+
+---
+spring.config.activate.on-profile: test
+hmpps-auth.url: http://localhost:9101/auth
+frontend.url: http://localhost:3000
+gotenberg.url: http://localhost:9101
+ndelius-integration-api.url: http://localhost:9101
+spring.datasource.url: jdbc:tc:postgresql:17:///db
+
+---
+spring.config.activate.on-profile: [test, dev]
+hmpps.sqs:
+  provider: localstack
+  queues:
+    hmppswarrantriskassessmentqueue:
+      queueName: hmpps-warrant-risk-assessment-queue
+      dlqName: hmpps-warrant-risk-assessment-queue-dlq
+      subscribeTopicId: hmppswarrantriskassessmenttopic
+    hmppswarrantriskassessmentpublishqueue:
+      queueName: hmpps-warrant-risk-assessment-publish-queue
+      dlqName: hmpps-warrant-risk-assessment-publish-queue-dlq
+      subscribeTopicId: hmppswarrantriskassessmentpublishtopic
+    audit:
+      queueName: audit-queue
+  topics:
+    hmppswarrantriskassessmenttopic:
+      arn: arn:aws:sns:eu-west-2:000000000000:hmppswarrantriskassessmenttopic
+    hmppswarrantriskassessmentpublishtopic:
+      arn: arn:aws:sns:eu-west-2:000000000000:hmppswarrantriskassessmentpublishtopic

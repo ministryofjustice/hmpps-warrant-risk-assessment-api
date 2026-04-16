@@ -1,0 +1,384 @@
+package uk.gov.justice.digital.hmpps.warrantriskassessmentapi.integration
+
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.entity.WarrantRiskAssessmentEntity
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantRiskAssessmentRepository
+import java.time.ZonedDateTime
+import java.util.concurrent.TimeUnit
+
+class DomainEventTest : IntegrationTestBase() {
+
+  @Autowired
+  private lateinit var warrantRiskAssessmentRepository: WarrantRiskAssessmentRepository
+
+  @Nested
+  @DisplayName("GET /warrant-risk-assessment/{parameter}")
+  inner class WarrantRiskAssessmentTestEntityEndpoint {
+
+    @Test
+    fun `merge event should update CRN for active warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000101"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000101").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000101")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      val message = "{\"eventType\":\"probation-case.merge.completed\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A merge has been completed on the probation case\",\"additionalInformation\":{\"sourceCRN\":\"X000101\",\"targetCRN\":\"X000102\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.merge.completed").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000102")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isEqualTo("MERGE")
+      }
+    }
+
+    @Test
+    fun `merge event should not update CRN for completed warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000111"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000111").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000111")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      warrantRiskAssessment.completedDate = ZonedDateTime.now()
+      warrantRiskAssessmentRepository.save(warrantRiskAssessment)
+
+      val message = "{\"eventType\":\"probation-case.merge.completed\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A merge has been completed on the probation case\",\"additionalInformation\":{\"sourceCRN\":\"X000111\",\"targetCRN\":\"X000102\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.merge.completed").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000111")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isNull()
+      }
+    }
+
+    @Test
+    fun `unmerge event should update CRN for active warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000121"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000121").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000121")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      // language=json
+      val message = """{
+        "eventType":"probation-case.unmerge.completed",
+        "version":1,
+        "occurredAt":"2025-04-15T09:49:55.560241+01:00",
+        "description":"An unmerge has been completed on the probation case",
+        "additionalInformation":{
+          "reactivatedCRN":"X000103",
+          "unmergedCRN":"X000121"
+        },
+        "personReference":{
+          "identifiers":[
+            {
+              "type":"CRN",
+              "value":"X000121"
+            }
+          ]
+        }
+      }
+      """.trimIndent()
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.unmerge.completed").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000103")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isEqualTo("UNMERGE")
+      }
+    }
+
+    @Test
+    fun `unmerge event should not update CRN for active warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000131"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000131").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000131")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      warrantRiskAssessment.completedDate = ZonedDateTime.now()
+      warrantRiskAssessmentRepository.save(warrantRiskAssessment)
+
+      val message: String = "{\n" +
+        "  \"eventType\":\"probation-case.unmerge.completed\",\n" +
+        "  \"version\":1,\n" +
+        "  \"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\n" +
+        "  \"description\":\"An unmerge has been completed on the probation case\",\n" +
+        "  \"additionalInformation\":{\n" +
+        "    \"reactivatedCRN\":\"X000103\",\n" +
+        "    \"unmergedCRN\":\"X000131\"},\n" +
+        "  \"personReference\":{\n" +
+        "    \"identifiers\":[\n" +
+        "      {\n" +
+        "        \"type\":\"CRN\",\n" +
+        "        \"value\":\"X000131\"\n" +
+        "      }\n" +
+        "    ]\n" +
+        "  }\n" +
+        "}"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.unmerge.completed").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000131")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isNull()
+      }
+    }
+
+    @Test
+    fun `move event should update CRN for active warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000141"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000141").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000141")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      val message = "{\"eventType\":\"probation-case.sentence.moved\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A merge has been completed on the probation case\",\"additionalInformation\":{\"sourceCRN\":\"X000141\",\"targetCRN\":\"X000102\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.sentence.moved").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000103")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isEqualTo("EVENT_MOVE")
+      }
+    }
+
+    @Test
+    fun `move event should not update CRN for completed warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000151"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000151").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000151")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      warrantRiskAssessment.completedDate = ZonedDateTime.now()
+      warrantRiskAssessmentRepository.save(warrantRiskAssessment)
+
+      val message = "{\"eventType\":\"probation-case.sentence.moved\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A merge has been completed on the probation case\",\"additionalInformation\":{\"sourceCRN\":\"X000151\",\"targetCRN\":\"X000102\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.sentence.moved").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000151")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isNull()
+      }
+    }
+
+    @Test
+    fun `gdpr event should remove all warrant risk assessments`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000161"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000161").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000161")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      val message = "{\"eventType\":\"probation-case.deleted.gdpr\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A merge has been completed on the probation case\",\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.deleted.gdpr").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentRefresh = warrantRiskAssessmentRepository.findByCrn("X000141")
+        assertThat(warrantRiskAssessmentRefresh).isEmpty()
+      }
+    }
+
+    @Test
+    fun `move nsi should update CRN for active warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000171"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000171").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000171")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      val message = "{\"eventType\":\"probation-case.non-statutory-intervention.moved\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A non-statutory intervention has been moved\",\"additionalInformation\":{\"sourceCRN\":\"X000171\",\"targetCRN\":\"X000102\",\"sourceEventNumber\":\"1\",\"targetEventNumber\":\"2\",\"nsiId\":\"87384\",\"nsiMainTypeCode\":\"BRE\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.non-statutory-intervention.moved").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000103")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isEqualTo("MOVE_NSI")
+      }
+    }
+
+    @Test
+    fun `move nsi should not update CRN for completed warrant risk assessment`() {
+      webTestClient.post()
+        .uri("/warrant-risk-assessment")
+        .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+        .bodyValue(WarrantRiskAssessment(crn = "X000181"))
+        .exchange()
+        .expectStatus()
+        .isCreated
+
+      val warrantRiskAssessment = warrantRiskAssessmentRepository.findByCrn("X000181").single()
+      assertThat(warrantRiskAssessment.crn).isEqualTo("X000181")
+      assertThat(warrantRiskAssessment.id).isNotNull()
+
+      warrantRiskAssessment.completedDate = ZonedDateTime.now()
+      warrantRiskAssessmentRepository.save(warrantRiskAssessment)
+
+      val message = "{\"eventType\":\"probation-case.non-statutory-intervention.moved\",\"version\":1,\"occurredAt\":\"2025-04-15T09:49:55.560241+01:00\",\"description\":\"A non-statutory intervention has been moved\",\"additionalInformation\":{\"sourceCRN\":\"X000181\",\"targetCRN\":\"X000102\",\"sourceEventNumber\":\"1\",\"targetEventNumber\":\"2\",\"nsiId\":\"87384\",\"nsiMainTypeCode\":\"BRE\"},\"personReference\":{\"identifiers\":[{\"type\":\"CRN\",\"value\":\"X000102\"}]}}\n"
+
+      val responseFuture = inboundSnsClient.publish(
+        PublishRequest.builder().topicArn("arn:aws:sns:eu-west-2:000000000000:hmppswarrantRiskAssessmenttopic").message(message).messageAttributes(
+          mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue("probation-case.merge.completed").build()),
+        ).build(),
+      )
+      val response = responseFuture.get(10, TimeUnit.SECONDS)
+
+      assertThat(response.messageId()).isNotNull()
+
+      Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        val warrantRiskAssessmentUpdated: WarrantRiskAssessmentEntity = warrantRiskAssessmentRepository.findById(warrantRiskAssessment.id).orElse(null)
+        assertThat(warrantRiskAssessmentUpdated).isNotNull
+        assertThat(warrantRiskAssessmentUpdated.crn).isEqualTo("X000181")
+        assertThat(warrantRiskAssessmentUpdated.id).isNotNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewRequiredDate).isNull()
+        assertThat(warrantRiskAssessmentUpdated.reviewEvent).isNull()
+      }
+    }
+  }
+}
