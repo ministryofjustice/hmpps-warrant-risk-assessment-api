@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -30,7 +31,7 @@ import java.util.UUID
 
 @Validated
 @RestController
-// @PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT')")
+@PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT')")
 @RequestMapping(value = ["/warrant-risk-assessment"], produces = ["application/json"])
 class WarrantRiskAssessmentController(
   private val warrantRiskAssessmentService: WarrantRiskAssessmentService,
