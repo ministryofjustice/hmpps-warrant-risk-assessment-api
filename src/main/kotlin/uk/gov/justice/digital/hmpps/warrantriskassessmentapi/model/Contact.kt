@@ -9,4 +9,7 @@ data class Contact(
   val contactTypeDescription: String? = null,
   val contactPerson: String? = null,
   val contactLocation: Address? = null,
+  val contactOutcome: String? = null,
+  val formSent: Boolean? = null,
+  val deliusContactId: Long? = null,
 )

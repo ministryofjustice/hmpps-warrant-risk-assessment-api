@@ -49,7 +49,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       sheetSentBy = "Joe Bloggs",
       titleAndFullName = "Mr Henry Bean",
       postalAddress = Address(
-        addressId = 25,
+        deliusAddressId = 25,
         status = "Postal",
         officeDescription = null,
         buildingName = "MOO",
@@ -80,7 +80,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       misuseDrugsAndAlcohol = true,
       dateOfBirth = LocalDate.now(),
       workAddress = Address(
-        addressId = 66,
+        deliusAddressId = 66,
         status = "Postal",
         officeDescription = "anOfficeDescription",
         buildingName = "MOO",
@@ -121,7 +121,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       sheetSentBy = "Joe Bloggs",
       titleAndFullName = "Mr Henry Bean",
       postalAddress = Address(
-        addressId = 25,
+        deliusAddressId = 25,
         status = "Postal",
         officeDescription = null,
         buildingName = "MOO",
@@ -152,7 +152,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       misuseDrugsAndAlcohol = true,
       dateOfBirth = LocalDate.now(),
       workAddress = Address(
-        addressId = 66,
+        deliusAddressId = 66,
         status = "Postal",
         officeDescription = "anOfficeDescription",
         buildingName = "MOO",

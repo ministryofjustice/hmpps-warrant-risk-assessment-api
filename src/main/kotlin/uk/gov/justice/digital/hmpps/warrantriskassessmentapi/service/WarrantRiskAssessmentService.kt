@@ -182,7 +182,7 @@ class WarrantRiskAssessmentService(
   )
 
   private fun AddressEntity.toModel() = Address(
-    addressId = addressId,
+    deliusAddressId = deliusAddressId,
     officeDescription = officeDescription,
     status = status,
     buildingName = buildingName,
@@ -195,7 +195,7 @@ class WarrantRiskAssessmentService(
   )
 
   private fun Address.toEntity(existingEntity: AddressEntity? = null) = existingEntity?.copy(
-    addressId = addressId,
+    deliusAddressId = deliusAddressId,
     officeDescription = officeDescription,
     status = status,
     buildingName = buildingName,
@@ -206,7 +206,7 @@ class WarrantRiskAssessmentService(
     county = county,
     postcode = postcode,
   ) ?: AddressEntity(
-    addressId = addressId,
+    deliusAddressId = deliusAddressId,
     status = status,
     officeDescription = officeDescription,
     buildingName = buildingName,
@@ -223,6 +223,9 @@ class WarrantRiskAssessmentService(
     contactDate = this.contactDate,
     contactTypeDescription = this.contactTypeDescription,
     contactPerson = this.contactPerson,
+    contactOutcome = this.contactOutcome,
+    formSent = this.formSent,
+    deliusContactId = this.deliusContactId,
     contactLocation = this.contactLocation?.toModel(),
   )
 
@@ -231,12 +234,18 @@ class WarrantRiskAssessmentService(
     contactDate = contactDate,
     contactPerson = contactPerson,
     contactLocation = contactLocation?.toEntity(),
-  ) ?: ContactEntity(
+    contactOutcome = contactOutcome,
+    formSent = formSent,
+    deliusContactId = deliusContactId,
+    ) ?: ContactEntity(
     contactTypeDescription = contactTypeDescription,
     contactDate = contactDate,
     contactPerson = contactPerson,
     contactLocation = contactLocation?.toEntity(),
-  )
+    contactOutcome = this.contactOutcome,
+    formSent = this.formSent,
+    deliusContactId = this.deliusContactId,
+    )
 
   fun getActiveWarrantRiskAssessmentsForCrn(crn: String?): Collection<WarrantRiskAssessmentEntity> = warrantRiskAssessmentRepository.findByCrnAndCompletedDateIsNull(crn)
 

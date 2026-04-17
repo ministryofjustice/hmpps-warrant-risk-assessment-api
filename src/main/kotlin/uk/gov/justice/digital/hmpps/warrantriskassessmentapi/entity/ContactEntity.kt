@@ -31,6 +31,9 @@ data class ContactEntity(
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
   @JoinColumn(name = "contact_location_id", unique = true)
   val contactLocation: AddressEntity? = null,
+  var contactOutcome: String? = null,
+  var formSent: Boolean? = null,
+  var deliusContactId: Long? = null,
   @CreatedBy
   var createdByUser: String? = null,
   @CreatedDate

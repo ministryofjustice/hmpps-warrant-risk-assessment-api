@@ -1,13 +1,10 @@
 package uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class Address(
-  val addressId: Long?,
+  val deliusAddressId: Long?,
   val status: String? = null,
   val officeDescription: String? = null,
   val buildingName: String? = null,
-  @JsonProperty("buildingNumber")
   val addressNumber: String? = null,
   val streetName: String? = null,
   val district: String? = null,
