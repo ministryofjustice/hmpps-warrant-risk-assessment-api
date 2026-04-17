@@ -237,7 +237,7 @@ class WarrantRiskAssessmentService(
     contactOutcome = contactOutcome,
     formSent = formSent,
     deliusContactId = deliusContactId,
-    ) ?: ContactEntity(
+  ) ?: ContactEntity(
     contactTypeDescription = contactTypeDescription,
     contactDate = contactDate,
     contactPerson = contactPerson,
@@ -245,7 +245,7 @@ class WarrantRiskAssessmentService(
     contactOutcome = this.contactOutcome,
     formSent = this.formSent,
     deliusContactId = this.deliusContactId,
-    )
+  )
 
   fun getActiveWarrantRiskAssessmentsForCrn(crn: String?): Collection<WarrantRiskAssessmentEntity> = warrantRiskAssessmentRepository.findByCrnAndCompletedDateIsNull(crn)
 
