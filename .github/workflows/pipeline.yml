@@ -22,84 +22,103 @@ permissions:
   packages: write
 
 concurrency:
-  # Only cancel in progress when on a branch - use SHA on main to ensure uniqueness.
-  # This will allow multiple pipelines to run at the same time on main.
-  # Note that two pipelines running within a few minutes of each other will cause issues with helm deploying to
-  # a namespace, as the second one will not be able to get a lock as a deploy will be in progress.
-  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # This will cancel all running build/test/release pipelines that are not on the main branch
+  # If this pipeline is on the main branch, it will wait until existing runs complete
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   helm_lint:
     strategy:
       matrix:
-        environments: ['dev', 'preprod', 'prod']
+        environments: [ 'dev', 'preprod', 'prod' ]
     name: helm lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW VERSION
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
-  app_version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.app_version.outputs.version }}
-    steps:
-      - id: app_version
-        name: Application version creators
-        uses: ministryofjustice/hmpps-github-actions/.github/actions/build-test-and-deploy/create_app_version@v2 # WORKFLOW_VERSION
-  gradle_verify:
+  kotlin_validate:
     name: Validate the kotlin
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@v2 # WORKFLOW_VERSION
-    secrets: inherit
-    with:
-      gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
-      upload-build-artifacts: ${{ github.ref == 'refs/heads/main' }}
-      java-version: "25"
-    needs:
-      - app_version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+          cache-dependency-path: |
+            *.gradle*
+            **/gradle-wrapper.properties
+      - run: docker compose up -d wiremock-integration
+      - run: ./gradlew check
+      - name: upload the artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: upload kotlin validation results
+          path: |
+            build/test-results
+            build/reports/tests
+    services:
+      localstack:
+        image: localstack/localstack:4
+        env:
+          SERVICES: sqs,sns
+          DEFAULT_REGION: eu-west-2
+        ports:
+          - 4566:4566
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
   build:
     name: Build docker image from hmpps-github-actions
     if: github.ref == 'refs/heads/main'
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
-    needs:
-      - gradle_verify
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
-      push: ${{ inputs.push || inputs.push == null }}
+      push: ${{ inputs.push || true }}
       docker_multiplatform: false
-      download_build_artifacts: true
   deploy_dev:
     name: Deploy to the development environment
     needs:
       - build
       - helm_lint
+      - kotlin_validate
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'dev'
       app_version: '${{ needs.build.outputs.app_version }}'
-      slack_notification: 'false' # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
-  # deploy_preprod:
-  #   name: Deploy to pre-production environment
-  #   needs:
-  #     - build
-  #     - deploy_dev
-  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
-  #   secrets: inherit
-  #   with:
-  #     environment: 'preprod'
-  #     app_version: '${{ needs.build.outputs.app_version }}'
-  #     slack_notification: 'false' # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
-  # deploy_prod:
-  #   name: Deploy to production environment
-  #   needs:
-  #     - build
-  #     - deploy_preprod
-  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
-  #   secrets: inherit
-  #   with:
-  #     environment: 'prod'
-  #     app_version: '${{ needs.build.outputs.app_version }}'
-  #     slack_notification: 'false' # if 'true', it needs a valid PROD_RELEASES_SLACK_CHANNEL variable to be set
+  deploy_preprod:
+    name: Deploy to pre-production environment
+    needs:
+      - build
+      - deploy_dev
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  deploy_prod:
+    name: Deploy to production environment
+    needs:
+      - build
+      - deploy_preprod
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'prod'
+      app_version: '${{ needs.build.outputs.app_version }}'

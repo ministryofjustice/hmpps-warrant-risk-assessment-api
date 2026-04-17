@@ -10,6 +10,16 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
+    NDELIUS-INTEGRATION-API_URL: "https://warrant-risk-assessment-and-delius-preprod.hmpps.service.justice.gov.uk"
+    FRONTEND_URL: "https://warrant-risk-assessment-preprod.hmpps.service.justice.gov.uk"
+
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - unilink_staff
+      - moj_cloud_platform
+      - delius-preprod
+
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

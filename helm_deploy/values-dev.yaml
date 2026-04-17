@@ -10,8 +10,15 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
-    SPRINGDOC_API-DOCS_ENABLED: "true"
-    SPRINGDOC_SWAGGER-UI_ENABLED: "true"
+    NDELIUS-INTEGRATION-API_URL: "https://warrant-risk-assessment-and-delius-dev.hmpps.service.justice.gov.uk"
+    FRONTEND_URL: "https://warrant-risk-assessment-dev.hmpps.service.justice.gov.uk"
+
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - unilink_staff
+      - moj_cloud_platform
+      - delius-test
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
