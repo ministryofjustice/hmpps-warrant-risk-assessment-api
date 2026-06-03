@@ -30,6 +30,9 @@ data class WarrantRiskAssessmentEntity(
   var dateOfLetter: LocalDate? = null,
   var sheetSentBy: String? = null,
   var telephoneNumber: String? = null,
+  var mobileNumber: String? = null,
+  var emailAddress: String? = null,
+  var lastHomeVisitDate: LocalDate? = null,
   var signature: String? = null,
   var completedDate: ZonedDateTime? = null,
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
