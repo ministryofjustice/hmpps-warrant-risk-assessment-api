@@ -31,7 +31,7 @@ import java.util.UUID
 
 @Validated
 @RestController
-@PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT')")
+@PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT__RW')")
 @RequestMapping(value = ["/warrant-risk-assessment"], produces = ["application/json"])
 class WarrantRiskAssessmentController(
   private val warrantRiskAssessmentService: WarrantRiskAssessmentService,

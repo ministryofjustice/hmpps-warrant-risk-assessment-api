@@ -20,7 +20,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
   fun `should create a warrant risk assessment`() {
     webTestClient.post()
       .uri("/warrant-risk-assessment")
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(WarrantRiskAssessment(crn = "X000001"))
       .exchange()
       .expectStatus()
@@ -35,7 +35,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
   fun `should update a Warrant Risk Assessment`() {
     webTestClient.post()
       .uri("/warrant-risk-assessment")
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(WarrantRiskAssessment(crn = "X000002"))
       .exchange()
       .expectStatus()
@@ -89,7 +89,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
 
     webTestClient.put()
       .uri("/warrant-risk-assessment/" + warrantRiskAssessment.id)
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(warrantRiskAssessmentBody)
       .exchange()
       .expectStatus()
@@ -107,7 +107,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
   fun `should update a Warrant Risk Assessment to completed`() {
     webTestClient.post()
       .uri("/warrant-risk-assessment")
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(WarrantRiskAssessment(crn = "X600002"))
       .exchange()
       .expectStatus()
@@ -161,7 +161,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
 
     webTestClient.put()
       .uri("/warrant-risk-assessment/" + warrantRiskAssessment.id)
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(warrantRiskAssessmentBody)
       .exchange()
       .expectStatus()
@@ -180,7 +180,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
   fun `should fail to create if the crn is too long`() {
     webTestClient.post()
       .uri("/warrant-risk-assessment")
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(WarrantRiskAssessment(crn = "X000001123456789123456"))
       .exchange()
       .expectStatus().isBadRequest
@@ -191,7 +191,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
   fun `should delete a warrant risk assessment`() {
     webTestClient.post()
       .uri("/warrant-risk-assessment")
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .bodyValue(WarrantRiskAssessment(crn = "X000004"))
       .exchange()
       .expectStatus()
@@ -203,7 +203,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
 
     webTestClient.delete()
       .uri("/warrant-risk-assessment/" + warrantRiskAssessment.first().id)
-      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT")))
+      .headers(setAuthorisation(roles = listOf("ROLE_WARRANT_RISK_ASSESSMENT__RW")))
       .exchange()
       .expectStatus()
       .isOk
