@@ -103,6 +103,8 @@ class WarrantRiskAssessmentService(
     basicDetailsSaved = basicDetailsSaved,
     signAndSendSaved = signAndSendSaved,
     contactSaved = contactSaved,
+    riskAssessmentSaved = riskAssessmentSaved,
+    riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
     warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map {
@@ -146,6 +148,8 @@ class WarrantRiskAssessmentService(
     basicDetailsSaved = basicDetailsSaved,
     signAndSendSaved = signAndSendSaved,
     contactSaved = contactSaved,
+    riskAssessmentSaved = riskAssessmentSaved,
+    riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
     warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map { it.toEntity() },
@@ -183,6 +187,8 @@ class WarrantRiskAssessmentService(
     basicDetailsSaved = basicDetailsSaved,
     signAndSendSaved = signAndSendSaved,
     contactSaved = contactSaved,
+    riskAssessmentSaved = riskAssessmentSaved,
+    riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
     warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map {

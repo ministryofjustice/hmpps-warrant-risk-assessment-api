@@ -59,6 +59,8 @@ data class WarrantRiskAssessmentEntity(
   var misuseDrugsAndAlcohol: Boolean? = null,
   var signAndSendSaved: Boolean? = null,
   var contactSaved: Boolean? = null,
+  var riskAssessmentSaved: Boolean? = null,
+  var riskSummarySaved: Boolean? = null,
   var reviewRequiredDate: LocalDateTime? = null,
   var reviewEvent: String? = null,
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "warrantRiskAssessment")

@@ -41,6 +41,8 @@ data class WarrantRiskAssessment(
   var basicDetailsSaved: Boolean? = null,
   var signAndSendSaved: Boolean? = null,
   var contactSaved: Boolean? = null,
+  var riskAssessmentSaved: Boolean? = null,
+  var riskSummarySaved: Boolean? = null,
   var reviewRequiredDate: LocalDateTime? = null,
   var reviewEvent: String? = null,
   @field:JsonSetter(nulls = Nulls.AS_EMPTY)

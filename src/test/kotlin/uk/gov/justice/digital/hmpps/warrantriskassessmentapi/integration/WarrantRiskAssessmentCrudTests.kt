@@ -60,6 +60,8 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       basicDetailsSaved = true,
       contactSaved = false,
       signAndSendSaved = false,
+      riskAssessmentSaved = true,
+      riskSummarySaved = false,
       prisonNumber = "123456",
       dateOfLetter = LocalDate.now(),
       telephoneNumber = "01911234560",
@@ -100,6 +102,8 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
     assertThat(updatedWarrantRiskAssessment.reviewEvent).isEqualTo("Merge")
     assertThat(updatedWarrantRiskAssessment.nationalInsuranceNumber).isEqualTo("A123")
     assertThat(updatedWarrantRiskAssessment.basicDetailsSaved).isEqualTo(true)
+    assertThat(updatedWarrantRiskAssessment.riskAssessmentSaved).isEqualTo(true)
+    assertThat(updatedWarrantRiskAssessment.riskSummarySaved).isEqualTo(false)
     assertThat(updatedWarrantRiskAssessment.workAddressEntity?.officeDescription).isEqualTo("anOfficeDescription")
   }
 
@@ -132,6 +136,8 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       basicDetailsSaved = true,
       contactSaved = false,
       signAndSendSaved = false,
+      riskAssessmentSaved = true,
+      riskSummarySaved = false,
       prisonNumber = "123456",
       dateOfLetter = LocalDate.now(),
       telephoneNumber = "01911234560",
@@ -172,6 +178,8 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
     assertThat(updatedWarrantRiskAssessment.reviewEvent).isEqualTo("Merge")
     assertThat(updatedWarrantRiskAssessment.nationalInsuranceNumber).isEqualTo("A123")
     assertThat(updatedWarrantRiskAssessment.basicDetailsSaved).isEqualTo(true)
+    assertThat(updatedWarrantRiskAssessment.riskAssessmentSaved).isEqualTo(true)
+    assertThat(updatedWarrantRiskAssessment.riskSummarySaved).isEqualTo(false)
     assertThat(updatedWarrantRiskAssessment.workAddressEntity?.officeDescription).isEqualTo("anOfficeDescription")
     assertThat(updatedWarrantRiskAssessment.completedDate).isNotNull()
   }
