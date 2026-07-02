@@ -48,7 +48,9 @@ data class WarrantRiskAssessmentEntity(
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
   @JoinColumn(name = "work_address_id", unique = true)
   var workAddressEntity: AddressEntity? = null,
-  var signOnOffice: UUID? = null,
+  @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+  @JoinColumn(name = "sign_on_office", unique = true)
+  var signOnOfficeEntity: AddressEntity? = null,
   var basicDetailsSaved: Boolean? = null,
   var subjectOfMappaProcedures: Boolean? = null,
   var highRiskOfSelfHarm: Boolean? = null,
