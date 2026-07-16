@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.Contact
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.CreateResponse
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.InitialiseWarrantRiskAssessment
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
-import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.ContactRepository
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantRiskAssessmentRepository
 import java.time.ZonedDateTime
 import java.util.*
@@ -22,7 +21,6 @@ import java.util.*
 @Service
 class WarrantRiskAssessmentService(
   val warrantRiskAssessmentRepository: WarrantRiskAssessmentRepository,
-  val contactRepository: ContactRepository,
   val pdfGenerationService: PdfGenerationService,
   @Value("\${frontend.url}") val frontendUrl: String,
 ) {
@@ -107,16 +105,7 @@ class WarrantRiskAssessmentService(
     riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
-    warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map {
-      it.toEntity(
-        existingEntity.warrantRiskAssessmentContactList.find { existingContactEntity ->
-          existingContactEntity.id == it.id
-        },
-      )
-    },
-  )?.also { warrantRiskAssessment ->
-    warrantRiskAssessment.warrantRiskAssessmentContactList.forEach { it.warrantRiskAssessment = warrantRiskAssessment }
-  } ?: WarrantRiskAssessmentEntity(
+  ) ?: WarrantRiskAssessmentEntity(
     crn = crn,
     titleAndFullName = titleAndFullName,
     dateOfLetter = dateOfLetter,
@@ -152,7 +141,6 @@ class WarrantRiskAssessmentService(
     riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
-    warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map { it.toEntity() },
   )
 
   private fun WarrantRiskAssessmentEntity.toModel() = WarrantRiskAssessment(
@@ -191,13 +179,11 @@ class WarrantRiskAssessmentService(
     riskSummarySaved = riskSummarySaved,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
-    warrantRiskAssessmentContactList = warrantRiskAssessmentContactList.map {
-      it.toModel()
-    },
   )
 
   private fun AddressEntity.toModel() = Address(
     deliusAddressId = deliusAddressId,
+    screen = screen,
     officeDescription = officeDescription,
     status = status,
     buildingName = buildingName,
@@ -207,6 +193,7 @@ class WarrantRiskAssessmentService(
     townCity = townCity,
     county = county,
     postcode = postcode,
+    warrantRiskAssessmentId = warrantRiskAssessmentId,
   )
 
   private fun Address.toEntity(existingEntity: AddressEntity? = null) = existingEntity?.copy(
@@ -220,8 +207,10 @@ class WarrantRiskAssessmentService(
     townCity = townCity,
     county = county,
     postcode = postcode,
+    warrantRiskAssessmentId = warrantRiskAssessmentId,
   ) ?: AddressEntity(
     deliusAddressId = deliusAddressId,
+    screen = screen,
     status = status,
     officeDescription = officeDescription,
     buildingName = buildingName,
@@ -231,35 +220,30 @@ class WarrantRiskAssessmentService(
     townCity = townCity,
     county = county,
     postcode = postcode,
+    warrantRiskAssessmentId = warrantRiskAssessmentId,
   )
 
   private fun ContactEntity.toModel() = Contact(
     id = this.id,
-    contactDate = this.contactDate,
-    contactTypeDescription = this.contactTypeDescription,
     contactPerson = this.contactPerson,
-    contactOutcome = this.contactOutcome,
-    formSent = this.formSent,
-    deliusContactId = this.deliusContactId,
+    telephoneNumber = this.telephoneNumber,
+    mobileNumber = this.mobileNumber,
     contactLocation = this.contactLocation?.toModel(),
+    warrantRiskAssessmentId = this.warrantRiskAssessmentId,
   )
 
   private fun Contact.toEntity(existingEntity: ContactEntity? = null) = existingEntity?.copy(
-    contactTypeDescription = contactTypeDescription,
-    contactDate = contactDate,
     contactPerson = contactPerson,
+    telephoneNumber = telephoneNumber,
+    mobileNumber = mobileNumber,
     contactLocation = contactLocation?.toEntity(),
-    contactOutcome = contactOutcome,
-    formSent = formSent,
-    deliusContactId = deliusContactId,
+    warrantRiskAssessmentId = warrantRiskAssessmentId,
   ) ?: ContactEntity(
-    contactTypeDescription = contactTypeDescription,
-    contactDate = contactDate,
     contactPerson = contactPerson,
+    telephoneNumber = telephoneNumber,
+    mobileNumber = mobileNumber,
     contactLocation = contactLocation?.toEntity(),
-    contactOutcome = this.contactOutcome,
-    formSent = this.formSent,
-    deliusContactId = this.deliusContactId,
+    warrantRiskAssessmentId = this.warrantRiskAssessmentId,
   )
 
   fun getActiveWarrantRiskAssessmentsForCrn(crn: String?): Collection<WarrantRiskAssessmentEntity> = warrantRiskAssessmentRepository.findByCrnAndCompletedDateIsNull(crn)

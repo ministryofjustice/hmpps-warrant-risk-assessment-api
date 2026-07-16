@@ -7,5 +7,5 @@ import java.util.*
 
 @Repository
 interface ContactRepository : JpaRepository<ContactEntity, UUID> {
-  fun findFirstByWarrantRiskAssessmentIdAndId(warrantRiskAssessmentId: UUID, contactId: UUID): ContactEntity?
+  fun findByWarrantRiskAssessmentId(warrantRiskAssessmentId: UUID): MutableList<ContactEntity>
 }

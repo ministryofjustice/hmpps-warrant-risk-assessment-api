@@ -5,7 +5,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedBy
@@ -65,8 +64,6 @@ data class WarrantRiskAssessmentEntity(
   var riskSummarySaved: Boolean? = null,
   var reviewRequiredDate: LocalDateTime? = null,
   var reviewEvent: String? = null,
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "warrantRiskAssessment")
-  val warrantRiskAssessmentContactList: List<ContactEntity> = emptyList(),
   @CreatedBy
   var createdByUser: String? = null,
   @CreatedDate
