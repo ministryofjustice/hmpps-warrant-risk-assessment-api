@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Pattern
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.UUID
 
 data class WarrantRiskAssessment(
   @field:Pattern(regexp = "^[A-Z][0-9]{6}")
@@ -25,7 +24,7 @@ data class WarrantRiskAssessment(
   var riskToEnforcementOfficers: String? = null,
   var riskToPolice: String? = null,
   var warrantExecutedBy: String? = null,
-  var signOnOffice: UUID? = null,
+  var signOnOffice: Address? = null,
   var subjectOfMappaProcedures: Boolean? = null,
   var highRiskOfSelfHarm: Boolean? = null,
   var highRiskOfAbsconding: Boolean? = null,

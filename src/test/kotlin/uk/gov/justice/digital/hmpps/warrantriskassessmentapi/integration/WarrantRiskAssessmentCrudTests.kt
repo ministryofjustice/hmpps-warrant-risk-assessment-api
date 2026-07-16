@@ -9,7 +9,6 @@ import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantR
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.UUID
 
 class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
 
@@ -72,7 +71,12 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       riskToEnforcementOfficers = "Risk to Enforcement Officers",
       riskToPolice = "Risk to police",
       warrantExecutedBy = "Warrant Executed By",
-      signOnOffice = UUID.randomUUID(),
+      signOnOffice = Address(
+        deliusAddressId = 67,
+        status = "Main",
+        officeDescription = "signOnOfficeDescription",
+        buildingName = "SOD",
+      ),
       subjectOfMappaProcedures = false,
       highRiskOfSelfHarm = false,
       highRiskOfAbsconding = false,
@@ -148,7 +152,12 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       riskToEnforcementOfficers = "Risk to Enforcement Officers",
       riskToPolice = "Risk to police",
       warrantExecutedBy = "Warrant Executed By",
-      signOnOffice = UUID.randomUUID(),
+      signOnOffice = Address(
+        deliusAddressId = 67,
+        status = "Main",
+        officeDescription = "signOnOfficeDescription",
+        buildingName = "SOD",
+      ),
       subjectOfMappaProcedures = false,
       highRiskOfSelfHarm = false,
       highRiskOfAbsconding = false,
