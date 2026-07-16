@@ -25,7 +25,7 @@ import java.util.UUID
 
 @Validated
 @RestController
- @PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT__RW')")
+@PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT__RW')")
 @RequestMapping(value = ["/warrant-risk-assessment/contact"], produces = ["application/json"])
 class ContactController(
   private val contactService: ContactService,

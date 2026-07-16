@@ -25,7 +25,7 @@ import java.util.UUID
 
 @Validated
 @RestController
- @PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT__RW')")
+@PreAuthorize("hasRole('ROLE_WARRANT_RISK_ASSESSMENT__RW')")
 @RequestMapping(value = ["/warrant-risk-assessment/address"], produces = ["application/json"])
 class AddressController(
   private val addressService: AddressService,
