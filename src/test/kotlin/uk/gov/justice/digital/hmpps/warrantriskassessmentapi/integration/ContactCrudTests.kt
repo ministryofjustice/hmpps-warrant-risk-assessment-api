@@ -224,4 +224,3 @@ class ContactCrudTests : IntegrationTestBase() {
     return warrantRiskAssessmentRepository.findByCrn(crn).single().id
   }
 }
-

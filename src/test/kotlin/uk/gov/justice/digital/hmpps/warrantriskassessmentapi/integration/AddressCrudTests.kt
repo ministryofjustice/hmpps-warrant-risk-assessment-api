@@ -223,4 +223,3 @@ class AddressCrudTests : IntegrationTestBase() {
     return warrantRiskAssessmentRepository.findByCrn(crn).single().id
   }
 }
-
