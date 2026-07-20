@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model
 
-import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.Nulls
 import jakarta.validation.constraints.Pattern
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -44,6 +42,4 @@ data class WarrantRiskAssessment(
   var riskSummarySaved: Boolean? = null,
   var reviewRequiredDate: LocalDateTime? = null,
   var reviewEvent: String? = null,
-  @field:JsonSetter(nulls = Nulls.AS_EMPTY)
-  var warrantRiskAssessmentContactList: List<Contact> = emptyList(),
 )

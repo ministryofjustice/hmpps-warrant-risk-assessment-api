@@ -52,6 +52,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Postal",
         officeDescription = null,
         buildingName = "MOO",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
       completedDate = ZonedDateTime.now(),
       reviewEvent = "Merge",
@@ -76,6 +77,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Main",
         officeDescription = "signOnOfficeDescription",
         buildingName = "SOD",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
       subjectOfMappaProcedures = false,
       highRiskOfSelfHarm = false,
@@ -90,6 +92,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Postal",
         officeDescription = "anOfficeDescription",
         buildingName = "MOO",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
     )
 
@@ -133,6 +136,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Postal",
         officeDescription = null,
         buildingName = "MOO",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
       completedDate = ZonedDateTime.now(),
       reviewEvent = "Merge",
@@ -157,6 +161,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Main",
         officeDescription = "signOnOfficeDescription",
         buildingName = "SOD",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
       subjectOfMappaProcedures = false,
       highRiskOfSelfHarm = false,
@@ -171,6 +176,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
         status = "Postal",
         officeDescription = "anOfficeDescription",
         buildingName = "MOO",
+        warrantRiskAssessmentId = warrantRiskAssessment.id,
       ),
     )
 

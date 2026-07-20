@@ -5,7 +5,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedBy
@@ -22,18 +21,13 @@ import java.util.*
 data class ContactEntity(
   @Id
   val id: UUID = UUID.randomUUID(),
-  @JoinColumn(name = "warrant_risk_assessment_id")
-  @ManyToOne
-  var warrantRiskAssessment: WarrantRiskAssessmentEntity? = null,
-  var contactDate: LocalDateTime? = null,
-  val contactTypeDescription: String? = null,
+  val warrantRiskAssessmentId: UUID,
   val contactPerson: String? = null,
+  val telephoneNumber: String? = null,
+  val mobileNumber: String? = null,
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
   @JoinColumn(name = "contact_location_id", unique = true)
   val contactLocation: AddressEntity? = null,
-  var contactOutcome: String? = null,
-  var formSent: Boolean? = null,
-  var deliusContactId: Long? = null,
   @CreatedBy
   var createdByUser: String? = null,
   @CreatedDate
