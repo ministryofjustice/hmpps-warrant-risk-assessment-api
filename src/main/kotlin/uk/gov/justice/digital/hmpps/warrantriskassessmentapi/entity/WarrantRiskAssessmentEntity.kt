@@ -33,6 +33,8 @@ data class WarrantRiskAssessmentEntity(
   var emailAddress: String? = null,
   var lastHomeVisitDate: LocalDate? = null,
   var signature: String? = null,
+  var responsibleOfficerFullName: String? = null,
+  var responsibleOfficerTelephoneNumer: String? = null,
   var completedDate: ZonedDateTime? = null,
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
   @JoinColumn(name = "postal_address_id", unique = true)
