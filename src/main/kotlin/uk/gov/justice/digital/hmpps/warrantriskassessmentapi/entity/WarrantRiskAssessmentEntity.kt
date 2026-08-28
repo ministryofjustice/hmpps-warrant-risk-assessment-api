@@ -64,7 +64,9 @@ data class WarrantRiskAssessmentEntity(
   var contactSaved: Boolean? = null,
   var riskAssessmentSaved: Boolean? = null,
   var riskSummarySaved: Boolean? = null,
-  var reviewRequiredDate: LocalDateTime? = null,
+  var terminated: Boolean? = null,
+  var terminatedUnterminatedDate: ZonedDateTime? = null,
+  var reviewRequiredDate: ZonedDateTime? = null,
   var reviewEvent: String? = null,
   @CreatedBy
   var createdByUser: String? = null,

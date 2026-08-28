@@ -105,6 +105,8 @@ class WarrantRiskAssessmentService(
     contactSaved = contactSaved,
     riskAssessmentSaved = riskAssessmentSaved,
     riskSummarySaved = riskSummarySaved,
+    terminated = terminated,
+    terminatedUnterminatedDate = terminatedUnterminatedDate,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
   ) ?: WarrantRiskAssessmentEntity(
@@ -143,6 +145,8 @@ class WarrantRiskAssessmentService(
     contactSaved = contactSaved,
     riskAssessmentSaved = riskAssessmentSaved,
     riskSummarySaved = riskSummarySaved,
+    terminated = terminated,
+    terminatedUnterminatedDate = terminatedUnterminatedDate,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
   )
@@ -183,6 +187,8 @@ class WarrantRiskAssessmentService(
     contactSaved = contactSaved,
     riskAssessmentSaved = riskAssessmentSaved,
     riskSummarySaved = riskSummarySaved,
+    terminated = terminated,
+    terminatedUnterminatedDate = terminatedUnterminatedDate,
     reviewRequiredDate = reviewRequiredDate,
     reviewEvent = reviewEvent,
   )
@@ -261,7 +267,7 @@ class WarrantRiskAssessmentService(
 
   fun updateReviewEvent(eventType: ReviewEventType, warrantRiskAssessment: WarrantRiskAssessmentEntity, occurredAt: ZonedDateTime) {
     warrantRiskAssessment.reviewEvent = eventType.name
-    warrantRiskAssessment.reviewRequiredDate = occurredAt.toLocalDateTime()
+    warrantRiskAssessment.reviewRequiredDate = occurredAt
     warrantRiskAssessmentRepository.save(warrantRiskAssessment)
   }
 

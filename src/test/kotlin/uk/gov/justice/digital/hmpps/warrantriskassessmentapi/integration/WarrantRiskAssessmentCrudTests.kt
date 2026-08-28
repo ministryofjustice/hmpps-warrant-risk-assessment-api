@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.Address
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantRiskAssessmentRepository
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
@@ -56,7 +55,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       ),
       completedDate = ZonedDateTime.now(),
       reviewEvent = "Merge",
-      reviewRequiredDate = LocalDateTime.now(),
+      reviewRequiredDate = ZonedDateTime.now(),
       basicDetailsSaved = true,
       contactSaved = false,
       signAndSendSaved = false,
@@ -140,7 +139,7 @@ class WarrantRiskAssessmentCrudTests : IntegrationTestBase() {
       ),
       completedDate = ZonedDateTime.now(),
       reviewEvent = "Merge",
-      reviewRequiredDate = LocalDateTime.now(),
+      reviewRequiredDate = ZonedDateTime.now(),
       basicDetailsSaved = true,
       contactSaved = false,
       signAndSendSaved = false,
