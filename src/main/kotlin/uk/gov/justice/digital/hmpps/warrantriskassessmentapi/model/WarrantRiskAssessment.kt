@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model
 
 import jakarta.validation.constraints.Pattern
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class WarrantRiskAssessment(
@@ -42,6 +41,8 @@ data class WarrantRiskAssessment(
   var contactSaved: Boolean? = null,
   var riskAssessmentSaved: Boolean? = null,
   var riskSummarySaved: Boolean? = null,
-  var reviewRequiredDate: LocalDateTime? = null,
+  var terminated: Boolean? = null,
+  var terminatedUnterminatedDate: ZonedDateTime? = null,
+  var reviewRequiredDate: ZonedDateTime? = null,
   var reviewEvent: String? = null,
 )
