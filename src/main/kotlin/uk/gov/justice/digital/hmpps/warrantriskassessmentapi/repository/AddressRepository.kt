@@ -8,4 +8,5 @@ import java.util.*
 @Repository
 interface AddressRepository : JpaRepository<AddressEntity, UUID> {
   fun findByWarrantRiskAssessmentIdAndScreen(id: UUID, screen: String): MutableList<AddressEntity>
+  fun findByWarrantRiskAssessmentId(id: UUID): MutableList<AddressEntity>
 }
