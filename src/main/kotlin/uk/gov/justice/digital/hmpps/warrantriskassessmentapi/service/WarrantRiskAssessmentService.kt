@@ -58,7 +58,7 @@ class WarrantRiskAssessmentService(
   }
 
   fun getWarrantRiskAssessmentAsPdf(id: UUID, warrantRiskAssessment: WarrantRiskAssessment?, draft: Boolean): ByteArray? {
-    val html = pdfGenerationService.generateHtml(warrantRiskAssessment)
+    val html = pdfGenerationService.generateHtml(warrantRiskAssessment, id)
 
     var pdfBytes = pdfGenerationService.generatePdf(html)
 
