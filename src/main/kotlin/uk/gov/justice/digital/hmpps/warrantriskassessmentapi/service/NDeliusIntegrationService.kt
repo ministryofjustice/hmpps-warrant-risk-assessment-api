@@ -16,8 +16,19 @@ class NDeliusIntegrationService(
     .bodyToMono(NDeliusCrn::class.java)
     .onErrorResume(WebClientResponseException.NotFound::class.java) { Mono.empty() }
     .block()
+
+  fun getWraEventDocuments(crn: String, eventNumber: String): List<String> = webClient.get()
+    .uri("/wra-event-documents/{crn}/{eventNumber}", crn, eventNumber)
+    .retrieve()
+    .bodyToMono(WraIdList::class.java)
+    .onErrorResume(WebClientResponseException.NotFound::class.java) { Mono.empty() }
+    .block()?.wraIdList ?: emptyList()
 }
 
 data class NDeliusCrn(
   val crn: String,
+)
+
+data class WraIdList(
+  val wraIdList: List<String>,
 )

@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.CreateRespons
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.InitialiseWarrantRiskAssessment
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantRiskAssessmentRepository
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -273,5 +274,12 @@ class WarrantRiskAssessmentService(
 
   fun deleteAllByCrn(crn: String) {
     warrantRiskAssessmentRepository.deleteByCrn(crn)
+  }
+
+  fun updateTerminatedStatus(newStatus: Boolean, wraId: String, occurredAt: ZonedDateTime) {
+    val wra = warrantRiskAssessmentRepository.findById(UUID.fromString(wraId)).orElseThrow { IllegalArgumentException("WarrantRiskAssessment not found") }
+    wra.terminated = newStatus
+    wra.terminatedUnterminatedDate = occurredAt.withZoneSameInstant(ZoneId.of("Europe/London"))
+    warrantRiskAssessmentRepository.save(wra)
   }
 }
