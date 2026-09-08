@@ -14,6 +14,8 @@ import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.Contact
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.CreateResponse
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.InitialiseWarrantRiskAssessment
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.AddressRepository
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.ContactRepository
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.WarrantRiskAssessmentRepository
 import java.time.ZonedDateTime
 import java.util.*
@@ -21,6 +23,8 @@ import java.util.*
 @Service
 class WarrantRiskAssessmentService(
   val warrantRiskAssessmentRepository: WarrantRiskAssessmentRepository,
+  val contactRepository: ContactRepository,
+  val addressRepository: AddressRepository,
   val pdfGenerationService: PdfGenerationService,
   @Value("\${frontend.url}") val frontendUrl: String,
 ) {
@@ -51,6 +55,16 @@ class WarrantRiskAssessmentService(
   fun deleteWarrantRiskAssessment(id: UUID): String {
     if (!warrantRiskAssessmentRepository.existsById(id)) {
       throw NotFoundException("WarrantRiskAssessmentEntity", "id", id)
+    }
+    // Find all the contacts associated with the warrant risk assessment and delete them first
+    val contacts: List<ContactEntity> = contactRepository.findByWarrantRiskAssessmentId(id)
+    contacts.forEach { contact ->
+      contactRepository.deleteById(contact.id)
+    }
+    // Find all the addresses associated with the warrant risk assessment and delete them first
+    val addresses: List<AddressEntity> = addressRepository.findByWarrantRiskAssessmentId(id)
+    addresses.forEach { address ->
+      addressRepository.deleteById(address.id)
     }
     val crn = findWarrantRiskAssessmentById(id).crn
     warrantRiskAssessmentRepository.deleteById(id)
