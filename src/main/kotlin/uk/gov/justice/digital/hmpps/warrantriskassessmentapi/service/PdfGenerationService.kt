@@ -14,9 +14,11 @@ import org.springframework.util.LinkedMultiValueMap
 import org.thymeleaf.context.Context
 import org.thymeleaf.spring6.SpringTemplateEngine
 import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.model.WarrantRiskAssessment
-import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.service.GotenbergApiClient
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.AddressRepository
+import uk.gov.justice.digital.hmpps.warrantriskassessmentapi.repository.ContactRepository
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
+import java.util.UUID
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -24,11 +26,17 @@ import kotlin.math.sin
 class PdfGenerationService(
   private val templateEngine: SpringTemplateEngine,
   private val gotenbergApiClient: GotenbergApiClient,
+  private val addressRepository: AddressRepository,
+  private val contactRepository: ContactRepository,
 ) {
 
-  fun generateHtml(warrantRiskAssessment: WarrantRiskAssessment?): String? {
+  fun generateHtml(warrantRiskAssessment: WarrantRiskAssessment?, id: UUID): String? {
     val context = Context()
     context.setVariable("warrantRiskAssessment", warrantRiskAssessment)
+    val otherAddresses = addressRepository.findByWarrantRiskAssessmentIdAndScreen(id, "basicDetails")
+    context.setVariable("otherAddresses", otherAddresses)
+    val employers = contactRepository.findByWarrantRiskAssessmentId(id)
+    context.setVariable("employers", employers)
 
     return templateEngine.process("warrant-risk-assessment-template", context)
   }
