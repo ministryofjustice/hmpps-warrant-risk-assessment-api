@@ -89,11 +89,31 @@ class DomainEventsListener(
 
         updateReviewEvent(ReviewEventType.MOVE_NSI, warrantRisks, message.occurredAt)
       }
+
+      "probation-case.sentence.terminated" -> {
+        val cossoIds = nDeliusIntegrationService.getWraEventDocuments(message.crn!!, message.additionalInformation?.get("eventNumber") as String)
+        updateTerminationEvent(true, cossoIds, message.occurredAt)
+      }
+
+      "probation-case.sentence.unterminated" -> {
+        val cossoIds = nDeliusIntegrationService.getWraEventDocuments(message.crn!!, message.additionalInformation?.get("eventNumber") as String)
+        updateTerminationEvent(false, cossoIds, message.occurredAt)
+      }
     }
   }
 
   private fun updateReviewEvent(eventType: ReviewEventType, warrantRisks: Collection<WarrantRiskAssessmentEntity>, occurredAt: ZonedDateTime) {
     warrantRisks.forEach { warrantRisk -> warrantRiskAssessmentService.updateReviewEvent(eventType, warrantRisk, occurredAt) }
+  }
+
+  private fun updateTerminationEvent(terminated: Boolean, cossoIds: Collection<String>, occurredAt: ZonedDateTime) {
+    cossoIds.forEach { cossoId ->
+      warrantRiskAssessmentService.updateTerminatedStatus(
+        terminated,
+        cossoId,
+        occurredAt,
+      )
+    }
   }
 }
 
