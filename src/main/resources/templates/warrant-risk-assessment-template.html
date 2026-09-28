@@ -145,29 +145,31 @@
                 <p style="margin: 0;"><span th:if="${employer.contactPerson != null}"
                                             th:text="${employer.contactPerson}">{contactPerson}</span>
                 </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.officeDescription != null}"
-                                            th:text="${employer.contactLocation.officeDescription}">{employerAddress.officeDescription}</span>
-                </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.buildingName != null}"
-                                            th:text="${employer.contactLocation.buildingName}">{employerAddress.buildingName}</span>
-                </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.addressNumber != null}"
-                                            th:text="${employer.contactLocation.addressNumber}">{employerAddress.addressNumber}</span><span
-                  th:if="${employer.contactLocation.addressNumber != null}"> </span><span
-                  th:if="${employer.contactLocation.streetName != null}"
-                  th:text="${employer.contactLocation.streetName}">{employerAddress.streetName}</span></p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.district != null}"
-                                            th:text="${employer.contactLocation.district}">{employerAddress.district}</span>
-                </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.townCity != null}"
-                                            th:text="${employer.contactLocation.townCity}">{employerAddress.buildingName}</span>
-                </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.county != null}"
-                                            th:text="${employer.contactLocation.county}">{employerAddress.county}</span>
-                </p>
-                <p style="margin: 0;"><span th:if="${employer.contactLocation.postcode != null}"
-                                            th:text="${employer.contactLocation.postcode}">{employerAddress.postcode}</span>
-                </p>
+                <div th:if="${employer.contactLocation != null}">
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.officeDescription != null}"
+                                              th:text="${employer.contactLocation.officeDescription}">{employerAddress.officeDescription}</span>
+                  </p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.buildingName != null}"
+                                              th:text="${employer.contactLocation.buildingName}">{employerAddress.buildingName}</span>
+                  </p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.addressNumber != null}"
+                                              th:text="${employer.contactLocation.addressNumber}">{employerAddress.addressNumber}</span><span
+                    th:if="${employer.contactLocation.addressNumber != null}"> </span><span
+                    th:if="${employer.contactLocation.streetName != null}"
+                    th:text="${employer.contactLocation.streetName}">{employerAddress.streetName}</span></p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.district != null}"
+                                              th:text="${employer.contactLocation.district}">{employerAddress.district}</span>
+                  </p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.townCity != null}"
+                                              th:text="${employer.contactLocation.townCity}">{employerAddress.buildingName}</span>
+                  </p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.county != null}"
+                                              th:text="${employer.contactLocation.county}">{employerAddress.county}</span>
+                  </p>
+                  <p style="margin: 0;"><span th:if="${employer.contactLocation.postcode != null}"
+                                              th:text="${employer.contactLocation.postcode}">{employerAddress.postcode}</span>
+                  </p>
+                </div>
                 <p style="margin: 0;"><span th:if="${employer.telephoneNumber != null}"
                                             th:text="${employer.telephoneNumber}">{telephoneNumber}</span>
                 </p>
