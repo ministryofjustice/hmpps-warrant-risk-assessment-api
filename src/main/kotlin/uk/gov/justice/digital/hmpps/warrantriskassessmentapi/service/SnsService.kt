@@ -35,7 +35,7 @@ class SnsService(
       personReference = PersonReference(listOf(Identifiers(type = "crn", value = warrantRiskAssessment.crn))),
       detailUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() + "/warrant-risk-assessment/" + id + "/pdf",
       additionalInformation = mapOf(
-        "warrantRiskAssessmentId" to id,
+        "WRAId" to id,
         "username" to SecurityContextHolder.getContext().authentication!!.name,
       ),
 
@@ -59,7 +59,7 @@ class SnsService(
       personReference = PersonReference(listOf(Identifiers(type = "crn", value = crn))),
       detailUrl = null,
       additionalInformation = mapOf(
-        "warrantRiskAssessmentId" to id,
+        "WRAId" to id,
         "username" to SecurityContextHolder.getContext().authentication!!.name,
       ),
 
