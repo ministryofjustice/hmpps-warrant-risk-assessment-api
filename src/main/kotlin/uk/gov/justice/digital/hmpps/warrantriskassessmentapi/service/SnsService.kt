@@ -59,7 +59,7 @@ class SnsService(
       personReference = PersonReference(listOf(Identifiers(type = "crn", value = crn))),
       detailUrl = null,
       additionalInformation = mapOf(
-        "warrantRiskAssessmentId" to id,
+        "WRAId" to id,
         "username" to SecurityContextHolder.getContext().authentication!!.name,
       ),
 
