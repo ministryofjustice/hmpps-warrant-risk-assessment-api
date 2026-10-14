@@ -54,7 +54,7 @@ data class WarrantRiskAssessmentEntity(
   var signOnOfficeEntity: AddressEntity? = null,
   var basicDetailsSaved: Boolean? = null,
   var subjectOfMappaProcedures: Boolean? = null,
-  var highRiskOfSelfHarm: Boolean? = null,
+  var highRiskOfSeriousHarm: Boolean? = null,
   var highRiskOfAbsconding: Boolean? = null,
   var vulnerable: Boolean? = null,
   var carryOrUseWeapons: Boolean? = null,

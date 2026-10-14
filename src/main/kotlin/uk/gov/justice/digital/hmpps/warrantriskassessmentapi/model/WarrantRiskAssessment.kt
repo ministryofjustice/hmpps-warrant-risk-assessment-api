@@ -25,7 +25,7 @@ data class WarrantRiskAssessment(
   var warrantExecutedBy: String? = null,
   var signOnOffice: Address? = null,
   var subjectOfMappaProcedures: Boolean? = null,
-  var highRiskOfSelfHarm: Boolean? = null,
+  var highRiskOfSeriousHarm: Boolean? = null,
   var highRiskOfAbsconding: Boolean? = null,
   var vulnerable: Boolean? = null,
   var carryOrUseWeapons: Boolean? = null,
