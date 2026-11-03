@@ -4,6 +4,8 @@ generic-service:
 
   replicaCount: 4
 
+  serviceAccountName: hmpps-warrant-risk-assessment
+
   image:
     repository: ghcr.io/ministryofjustice/hmpps-warrant-risk-assessment-api
     tag: app_version # override at deployment time
