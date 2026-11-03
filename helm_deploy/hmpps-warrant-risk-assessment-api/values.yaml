@@ -24,8 +24,8 @@ generic-service:
     hmpps-warrant-risk-assessment-api-application-insights:
       APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
     hmpps-warrant-risk-assessment-api-client-creds:
-      HMPPS-AUTH_CLIENT-ID: CLIENT_CREDS_CLIENT_ID
-      HMPPS-AUTH_CLIENT-SECRET: CLIENT_CREDS_CLIENT_SECRET
+      HMPPS-AUTH_CLIENT-ID: API_CLIENT_ID
+      HMPPS-AUTH_CLIENT-SECRET: API_CLIENT_SECRET
     rds-instance-output:
       DATABASE_ENDPOINT: rds_instance_endpoint
       DATABASE_USERNAME: database_username
