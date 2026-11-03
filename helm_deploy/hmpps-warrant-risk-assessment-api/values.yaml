@@ -18,21 +18,7 @@ generic-service:
   env:
     SERVER_PORT: "8080"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
-    # JAVA_TOOL_OPTIONS is set in the base image (hmpps-eclipse-temurin) with:
-    #   -XX:MaxRAMPercentage=50.0
-    # Uncomment below to override memory settings if needed.
-    # Check resources.limits.memory is set appropriately.
-    #
-    # Percentage-based example:
-    #   JAVA_TOOL_OPTIONS: "-XX:InitialRAMPercentage=50.0 -XX:MaxRAMPercentage=75.0"
-    #
-    # Fixed memory example:
-    #   JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
-
-  # Pre-existing kubernetes secrets to load as environment variables in the deployment.
-  # namespace_secrets:
-  #   [name of kubernetes secret]:
-  #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
+    GOTENBERG_URL: http://hmpps-warrant-risk-assessment-api-gotenberg
 
   namespace_secrets:
     hmpps-warrant-risk-assessment-api-application-insights:
@@ -46,6 +32,49 @@ generic-service:
   allowlist:
     groups:
       - internal
+
+gotenberg:
+  nameOverride: gotenberg
+  replicaCount: 2
+
+  image:
+    repository: gotenberg/gotenberg
+    tag: 8
+    port: 3000
+
+  ingress:
+    enabled: false
+
+  livenessProbe:
+    httpGet:
+      path: /health
+    periodSeconds: 30
+    initialDelaySeconds: 60
+    timeoutSeconds: 20
+    failureThreshold: 10
+
+  readinessProbe:
+    httpGet:
+      path: /health
+    periodSeconds: 20
+    initialDelaySeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 15
+
+  podSecurityContext:
+    fsGroup: 1001
+
+  securityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    privileged: false
+
+  env:
+    GOOGLE_CHROME_IGNORE_CERTIFICATE_ERRORS: 1
+    DISABLE_UNOCONV: 1
+    DEFAULT_WAIT_TIMEOUT: 30
 
 generic-prometheus-alerts:
   targetApplication: hmpps-warrant-risk-assessment-api
