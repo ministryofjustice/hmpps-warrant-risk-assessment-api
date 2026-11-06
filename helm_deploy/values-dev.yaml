@@ -19,4 +19,4 @@ generic-service:
       - unilink_staff
       - moj_cloud_platform
       - delius-test
-
+      - mod-platform-non-live
