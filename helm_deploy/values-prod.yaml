@@ -16,4 +16,5 @@ generic-service:
       - unilink_staff
       - moj_cloud_platform
       - delius-prod
+      - mod-platform-live
 
